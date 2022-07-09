@@ -29,6 +29,4 @@ public class GithubUser {
         this.bio = bio;
     }
 
-
-
 }

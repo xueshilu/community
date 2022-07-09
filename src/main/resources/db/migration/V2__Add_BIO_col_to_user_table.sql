@@ -1,0 +1,1 @@
+alter table USERS ADD BIO VARCHAR(256);
