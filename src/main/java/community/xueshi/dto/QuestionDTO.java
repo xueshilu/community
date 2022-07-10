@@ -1,10 +1,10 @@
-package community.xueshi.model;
+package community.xueshi.dto;
 
+import community.xueshi.model.User;
 import lombok.Data;
-import org.apache.ibatis.annotations.Insert;
 
 @Data
-public class Question {
+public class QuestionDTO {
     private Integer id;
     private String title;
     private String description;
@@ -15,4 +15,5 @@ public class Question {
     private Integer view_count;
     private Integer comment_count;
     private int like_count;
+    private User user;
 }

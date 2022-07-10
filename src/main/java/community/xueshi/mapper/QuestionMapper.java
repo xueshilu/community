@@ -3,6 +3,9 @@ package community.xueshi.mapper;
 import community.xueshi.model.Question;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface QuestionMapper {
@@ -13,4 +16,6 @@ public interface QuestionMapper {
     @Insert("INSERT INTO QUESTION (TITLE) VALUES (${title})")
     public void create2(Question question);
 
+    @Select("SELECT * FROM QUESTION")
+    List<Question> list();
 }
