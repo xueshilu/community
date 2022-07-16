@@ -1,5 +1,6 @@
 package community.xueshi.service;
 
+import community.xueshi.dto.PaginationDTO;
 import community.xueshi.dto.QuestionDTO;
 import community.xueshi.mapper.QuestionMapper;
 import community.xueshi.mapper.UserMapper;
@@ -21,9 +22,20 @@ public class QuestionService {
     @Autowired
     private UserMapper userMapper;
 
-    public List<QuestionDTO> list() {
-        List<Question> questions = questionMapper.list();
+    public PaginationDTO list(Integer page, Integer size) {
+        PaginationDTO paginationDTO = new PaginationDTO();
+        Integer totalCount = questionMapper.count();
+
+        int totalPage = (int) Math.ceil((double) totalCount / size);
+        if(page < 1) page = 1;
+        if(page > totalPage) page = totalPage;
+
+        paginationDTO.setPagination(totalPage, page);
+
+        Integer offset = size*(page-1);
+        List<Question> questions = questionMapper.list(offset, size);
         List<QuestionDTO> questionDTOS = new ArrayList<>();
+
         for (Question question : questions) {
             User user = userMapper.findById(question.getCreator());
             QuestionDTO questionDTO = new QuestionDTO();
@@ -31,6 +43,8 @@ public class QuestionService {
             questionDTO.setUser(user);
             questionDTOS.add(questionDTO);
         }
-        return questionDTOS;
+        paginationDTO.setQuestions(questionDTOS);
+
+        return paginationDTO;
     }
 }

@@ -3,6 +3,7 @@ package community.xueshi.mapper;
 import community.xueshi.model.Question;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -13,9 +14,9 @@ public interface QuestionMapper {
     @Insert("INSERT INTO QUESTION (TITLE, DESCRIPTION, GMT_CREATE, GMT_MODIFIED, CREATOR, TAG) VALUES (${title},${description},${gmt_create},${gmt_modified},${creator},${tag})")
     public void create(Question question);
 
-    @Insert("INSERT INTO QUESTION (TITLE) VALUES (${title})")
-    public void create2(Question question);
+    @Select("SELECT * FROM QUESTION LIMIT #{offset}, #{size}")
+    List<Question> list(@Param(value = "offset") Integer offset, @Param(value = "size") Integer size);
 
-    @Select("SELECT * FROM QUESTION")
-    List<Question> list();
+    @Select("SELECT COUNT(1) FROM QUESTION")
+    Integer count();
 }
