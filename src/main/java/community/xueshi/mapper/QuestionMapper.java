@@ -2,17 +2,14 @@ package community.xueshi.mapper;
 
 import community.xueshi.dto.QuestionDTO;
 import community.xueshi.model.Question;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface QuestionMapper {
 
-    @Insert("INSERT INTO QUESTION (TITLE, DESCRIPTION, GMT_CREATE, GMT_MODIFIED, CREATOR, TAG) VALUES (${title},${description},${gmt_create},${gmt_modified},${creator},${tag})")
+    @Insert("INSERT INTO QUESTION (TITLE, DESCRIPTION, GMT_CREATE, GMT_MODIFIED, CREATOR, TAG) VALUES (#{title},#{description},#{gmt_create},#{gmt_modified},#{creator},#{tag})")
     public void create(Question question);
 
     @Select("SELECT * FROM QUESTION LIMIT #{offset}, #{size}")
@@ -27,4 +24,7 @@ public interface QuestionMapper {
 
     @Select("SELECT * FROM QUESTION WHERE id = #{id}")
     Question getById(@Param("id")Integer id);
+
+    @Update("UPDATE QUESTION SET TITLE = #{title}, DESCRIPTION = #{description},GMT_CREATE = #{gmt_create}, GMT_MODIFIED = #{gmt_modified}, TAG = #{tag} WHERE id = #{id}")
+    void update(Question question);
 }
