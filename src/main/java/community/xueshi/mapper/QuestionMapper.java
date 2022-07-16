@@ -1,5 +1,6 @@
 package community.xueshi.mapper;
 
+import community.xueshi.dto.QuestionDTO;
 import community.xueshi.model.Question;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,4 +20,11 @@ public interface QuestionMapper {
 
     @Select("SELECT COUNT(1) FROM QUESTION")
     Integer count();
+    @Select("SELECT * FROM QUESTION WHERE creator = #{userId} LIMIT #{offset}, #{size}")
+    List<Question> listByUserId(@Param(value = "userId") Integer userId, @Param(value = "offset") Integer offset, @Param(value = "size") Integer size);
+    @Select("SELECT COUNT(1) FROM QUESTION WHERE creator = #{userId}  ")
+    Integer countByUserId(@Param(value = "userId") Integer userId);
+
+    @Select("SELECT * FROM QUESTION WHERE id = #{id}")
+    Question getById(@Param("id")Integer id);
 }
