@@ -2,8 +2,11 @@ package community.xueshi.service;
 
 import community.xueshi.mapper.UserMapper;
 import community.xueshi.model.User;
+import community.xueshi.model.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -12,24 +15,34 @@ public class UserService {
     private UserMapper userMapper;
 
     public void createOrUpdate(User user) {
-        System.out.println("cou");
-        User dbUser = userMapper.findByAccountId(user.getAccount_id());
-        if(dbUser == null){
+        UserExample userExample = new UserExample();
+        userExample.createCriteria()
+                        .andAccountIdEqualTo(user.getAccountId());
+        List<User> users = userMapper.selectByExample(userExample);
+
+        if(users.size() == 0){
             //insert
             System.out.println("insert");
-            user.setGmt_create(System.currentTimeMillis());
-            user.setGmt_modified(user.getGmt_create());
+            user.setGmtCreate(System.currentTimeMillis());
+            user.setGmtModified(user.getGmtCreate());
             userMapper.insert(user);
         }
         else{
             //update
-            System.out.println("updaste");
-            dbUser.setGmt_create(System.currentTimeMillis());
-            dbUser.setGmt_modified(user.getGmt_create());
-            dbUser.setName(user.getName());
-            dbUser.setToken(user.getToken());
-            dbUser.setAvatar_url(user.getAvatar_url());
-            userMapper.update(dbUser);
+            User dbUser = users.get(0);
+            System.out.println("update");
+
+            User updateUser = new User();
+
+            updateUser.setGmtCreate(System.currentTimeMillis());
+            updateUser.setGmtModified(user.getGmtCreate());
+            updateUser.setName(user.getName());
+            updateUser.setToken(user.getToken());
+            updateUser.setAvatarUrl(user.getAvatarUrl());
+            UserExample example = new UserExample();
+            example.createCriteria()
+                            .andIdEqualTo(dbUser.getId());
+            userMapper.updateByExampleSelective(updateUser, example);
         }
 
     }

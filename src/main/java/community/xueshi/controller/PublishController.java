@@ -4,6 +4,7 @@ import community.xueshi.mapper.QuestionMapper;
 import community.xueshi.mapper.UserMapper;
 import community.xueshi.model.Question;
 import community.xueshi.model.User;
+import community.xueshi.model.UserExample;
 import community.xueshi.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class PublishController {
@@ -29,7 +31,7 @@ public class PublishController {
     @GetMapping("/publish/{id}")
     public String edit(@PathVariable(name="id") Integer id,
                        Model model){
-        Question question = questionMapper.getById(id);
+        Question question = questionMapper.selectByPrimaryKey(id);
         model.addAttribute("title", question.getTitle());
         model.addAttribute("description", question.getDescription());
         model.addAttribute("tag", question.getTag());
@@ -72,9 +74,12 @@ public class PublishController {
         for(Cookie cookie : cookies){
             if(cookie.getName().equals("token")){
                 String token = cookie.getValue();
-                user = userMapper.findByToken(token);
-                if(user != null){
-                    request.getSession().setAttribute("user", user);
+                UserExample example = new UserExample();
+                example.createCriteria()
+                        .andTokenEqualTo(token);
+                List<User> users = userMapper.selectByExample(example);
+                if(users.size() != 0){
+                    request.getSession().setAttribute("user", users.get(0));
                 }
                 break;
             }
