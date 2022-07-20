@@ -2,6 +2,7 @@ package community.xueshi.service;
 
 import community.xueshi.dto.PaginationDTO;
 import community.xueshi.dto.QuestionDTO;
+import community.xueshi.mapper.QuestionExtMapper;
 import community.xueshi.mapper.QuestionMapper;
 import community.xueshi.mapper.UserMapper;
 import community.xueshi.model.Question;
@@ -23,12 +24,16 @@ public class QuestionService {
     private QuestionMapper questionMapper;
 
     @Autowired
+    private QuestionExtMapper questionExtMapper;
+
+    @Autowired
     private UserMapper userMapper;
 
     public PaginationDTO list(Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
 
         Integer totalCount = (int)questionMapper.countByExample(new QuestionExample());
+        System.out.println(totalCount);
 
         int totalPage = (int) Math.ceil((double) totalCount / size);
         if(page < 1) page = 1;
@@ -97,16 +102,16 @@ public class QuestionService {
 
     public void createOrUpdate(Question question) {
         if(question.getId() == null){
-            question.setGmtCreate(System.currentTimeMillis());
-            question.setGmtModified(question.getGmtCreate());
-            question.setViewCount(0);
-            question.setLikeCount(0);
-            question.setCommentCount(0);
+            question.setGmtcreator(System.currentTimeMillis());
+            question.setGmtmodified(question.getGmtcreator());
+            question.setViewcount(0);
+            question.setLikecount(0);
+            question.setCommentcount(0);
             questionMapper.insert(question);
         }
         else{
             Question updateQuestion = new Question();
-            updateQuestion.setGmtModified(System.currentTimeMillis());
+            updateQuestion.setGmtmodified(System.currentTimeMillis());
             updateQuestion.setTitle(question.getTitle());
             updateQuestion.setDescription(question.getDescription());
             updateQuestion.setTag(question.getTag());
@@ -115,5 +120,12 @@ public class QuestionService {
                     .andIdEqualTo(question.getId());
             questionMapper.updateByExampleSelective(updateQuestion, example);
         }
+    }
+
+    public void incView(Integer id) {
+        Question record = new Question();
+        record.setId(id);
+        record.setViewcount(1);
+        questionExtMapper.incView(record);
     }
 }

@@ -1,6 +1,7 @@
 package community.xueshi.controller;
 
 import community.xueshi.dto.QuestionDTO;
+import community.xueshi.mapper.QuestionExtMapper;
 import community.xueshi.model.User;
 import community.xueshi.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,13 @@ public class QuestionController {
 
     @Autowired
     private QuestionService questionService;
-
-
     @GetMapping("/question/{id}")
-    public String question(@PathVariable(name = "id") String id,
+    public String question(@PathVariable(name = "id") Integer id,
                            Model model,
                            HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute("user");
-        System.out.println("xueshi id" + id);
-        QuestionDTO questionDTO = questionService.getById(Integer.parseInt(id));
+        QuestionDTO questionDTO = questionService.getById(id);
+        questionService.incView(id);
         questionDTO.setUser(user);
         model.addAttribute("question", questionDTO);
 
