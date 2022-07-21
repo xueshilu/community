@@ -2,6 +2,8 @@ package community.xueshi.service;
 
 import community.xueshi.dto.PaginationDTO;
 import community.xueshi.dto.QuestionDTO;
+import community.xueshi.exception.CustomizeErrorCode;
+import community.xueshi.exception.CustomizeException;
 import community.xueshi.mapper.QuestionExtMapper;
 import community.xueshi.mapper.QuestionMapper;
 import community.xueshi.mapper.UserMapper;
@@ -33,7 +35,6 @@ public class QuestionService {
         PaginationDTO paginationDTO = new PaginationDTO();
 
         Integer totalCount = (int)questionMapper.countByExample(new QuestionExample());
-        System.out.println(totalCount);
 
         int totalPage = (int) Math.ceil((double) totalCount / size);
         if(page < 1) page = 1;
@@ -57,7 +58,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public PaginationDTO list(Integer userId, Integer page, Integer size) {
+    public PaginationDTO list(Long userId, Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
 
         QuestionExample questionExample = new QuestionExample();
@@ -93,8 +94,11 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public QuestionDTO getById(Integer id) {
+    public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if (question == null) {
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         return questionDTO;
@@ -110,6 +114,13 @@ public class QuestionService {
             questionMapper.insert(question);
         }
         else{
+            // 更新
+            Question dbQuestion = questionMapper.selectByPrimaryKey(question.getId());
+            if (dbQuestion == null)
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            if (dbQuestion.getCreator().longValue() != question.getCreator().longValue())
+                throw new CustomizeException(CustomizeErrorCode.INVALID_OPERATION);
+
             Question updateQuestion = new Question();
             updateQuestion.setGmtmodified(System.currentTimeMillis());
             updateQuestion.setTitle(question.getTitle());
@@ -118,11 +129,12 @@ public class QuestionService {
             QuestionExample example = new QuestionExample();
             example.createCriteria()
                     .andIdEqualTo(question.getId());
-            questionMapper.updateByExampleSelective(updateQuestion, example);
+            int updated = questionMapper.updateByExampleSelective(updateQuestion, example);
+            if(updated != 1) throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         }
     }
 
-    public void incView(Integer id) {
+    public void incView(Long id) {
         Question record = new Question();
         record.setId(id);
         record.setViewcount(1);

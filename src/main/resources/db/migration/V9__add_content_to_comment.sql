@@ -1,0 +1,1 @@
+alter table COMMENT add "Content" VARCHAR(1024);

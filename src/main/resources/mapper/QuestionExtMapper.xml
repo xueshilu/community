@@ -25,4 +25,11 @@
         VIEWCOUNT = VIEWCOUNT + #{viewcount, jdbcType=INTEGER}
     where id = #{id}
   </update>
+
+  <update id="incCommentCount" parameterType="community.xueshi.model.Question">
+    update QUESTION
+    set
+      COMMENTCOUNT = COMMENTCOUNT + #{commentcount, jdbcType=INTEGER}
+    where id = #{id}
+  </update>
 </mapper>
